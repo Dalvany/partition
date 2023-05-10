@@ -1,0 +1,5 @@
+**/target
+/gen
+/.idea
+/libraries/**/Cargo.lock
+/docker/volumes

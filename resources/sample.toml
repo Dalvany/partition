@@ -1,0 +1,31 @@
+listen = "127.0.0.1:8000"
+log_config = "tests-resources/logger.yml"
+
+[headers]
+Access-Control-Allow-Origin = "*"
+Access-Control-Allow-Methods = "*"
+Access-Control-Allow-Headers = "*"
+
+[library]
+path = "target/partition/library"
+tmp = "target/partition/tmp"
+
+[indexing]
+path = "target/partition/index"
+
+[database]
+# For mariadb/mysql
+#connection = { mysql = "127.0.0.1:3306"}
+# For postgres
+connection = { postgres = "127.0.0.1:5432"}
+
+# Or use DATABASE_USER env variable
+username = "partition"
+# Or use DATABASE_PASSWORD env variable
+password = "partition"
+# Or use DATABASE_NAME env variable
+name = "partition"
+
+
+[ui]
+path = "resources/ui"

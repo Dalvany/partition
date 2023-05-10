@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  mariadb:
+    image: mariadb:latest
+    restart: unless-stopped
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
+      MARIADB_DATABASE: "partition"
+      MARIADB_USER: "partition"
+      MARIADB_PASSWORD: "partition"
+    volumes:
+      - ./docker/volumes/mariadb:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  postgres:
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "partition"
+      POSTGRES_USER: "partition"
+      POSTGRES_PASSWORD: "partition"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./docker/volumes/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"

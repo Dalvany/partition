@@ -1,0 +1,241 @@
+openapi: 3.0.3
+
+info:
+  title: Partition API
+  version: 0.1.0
+  description: Openapi specification for Partition
+
+servers:
+  - url: /api/{apiVersion}
+    description: Partition API
+    variables:
+      apiVersion:
+        default: v1
+
+paths:
+  /:
+    summary: Partition informations
+    description: Partition informations
+    get:
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/informations'
+  /search:
+    summary: Search
+    description: Search through library using index
+    get:
+      parameters:
+        - in: query
+          name: q
+          description: Query text
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: limit
+          description: Number of result
+          schema:
+            type: integer
+        - in: query
+          name: offset
+          description: First result
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of song matching query
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/song'
+
+  /playlists:
+    summary: Playlists
+    description: Playlists
+    post:
+      responses:
+        '201':
+          description: Playlist successfully created
+        default:
+          description: Unexpected error
+      requestBody:
+        description: Playlist data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/playlist'
+    get:
+      responses:
+        '200':
+          description: List all playslists
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/playlist'
+
+  /playlists/{id}:
+    summary: Manipulate playlists
+    description: Manipulate playlists
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+          format: i32
+        required: true
+        description: Playlist unique ID
+    get:
+      description: Get playlist
+      responses:
+        '200':
+          description: Playlist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/playlist'
+        '404':
+          description: Unknown playlist
+        default:
+          description: Unexpected error
+    delete:
+      description: Delete a playlist
+      responses:
+        '200':
+          description: Playlist deleted
+        '404':
+          description: Unknown playlist
+        default:
+          description: Unexpected error
+
+  /songs:
+    summary: Upload a new file.
+    description: >
+      Upload a new file. Server will parse tags to get information about title, album, ...etc.
+    post:
+      parameters:
+        - in: header
+          name: X-Filename
+          schema:
+            type: string
+          required: true
+      responses:
+        '201':
+          description: Successful operation
+        '415':
+          description: File format not supported
+        default:
+          description: Unexpected error
+      requestBody:
+        description: Upload an audio file (must be encoded in base64)
+        required: true
+        content:
+          audio/*:
+            schema:
+              type: string
+              format: base64
+
+  /songs/{id}:
+    summary: Song metadata
+    description: >
+      Manipulate song
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+          format: i32
+        required: true
+        description: Song unique ID
+    get:
+      description: Get song metadata
+      responses:
+        '200':
+          description: Song metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/song'
+        '404':
+          description: Unknown song
+        default:
+          description: Unexpected error
+    delete:
+      description: Delete a song, metadata and binary
+      responses:
+        '200':
+          description: Song deleted
+        '404':
+          description: Unknown song
+        default:
+          description: Unexpected error
+    put:
+      description: Update playlist
+      responses:
+        '200':
+          description: Playlist updated
+        '404':
+          description: Unknown playlist
+        '400':
+          description: Wrong data
+        default:
+          description: Unexpected error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/playlist'
+
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    informations:
+      type: object
+      properties:
+        version:
+          type: string
+    song:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: i32
+        title:
+          type: string
+        album:
+          type: string
+        track:
+          type: integer
+          format: i32
+        artist:
+          type: string
+        duration:
+          type: integer
+    playlist:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: i32
+          nullable: true
+        query:
+          type: string
+          nullable: true
+        songs:
+          type: array
+          items:
+            $ref: '#/components/schemas/song'
