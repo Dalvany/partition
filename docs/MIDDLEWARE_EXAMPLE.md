@@ -107,7 +107,7 @@ where
             C: Has<XSpanIdString> + Has<Option<Authorization>> + Send + Sync + 'static,
             B: Send + 'static,
         {
-            info!("Doing stuff on request");
+            info!("Doing stuff on request inside async function");
 
             let result = inner.call(req).await;
 
@@ -124,7 +124,10 @@ where
 
             result
         }
-        Box::pin(test(self.inner.clone(), req))
+        
+        let (request, context) = req;
+        info!("Doing stuff on request inside call function");
+        Box::pin(test(self.inner.clone(), (request, context)))
     }
 }
 
